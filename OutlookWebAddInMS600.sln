@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutlookWebAddIn", "OutlookWebAddIn\OutlookWebAddIn.csproj", "{621EED52-5239-4D0F-A262-6F68BBA37DA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutlookWebAddInWeb", "OutlookWebAddInWeb\OutlookWebAddInWeb.csproj", "{EC1B61B5-0779-4549-AC4D-A88DD0145D24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{621EED52-5239-4D0F-A262-6F68BBA37DA2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EC1B61B5-0779-4549-AC4D-A88DD0145D24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1B61B5-0779-4549-AC4D-A88DD0145D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1B61B5-0779-4549-AC4D-A88DD0145D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1B61B5-0779-4549-AC4D-A88DD0145D24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D79A093-A0F8-4EFD-A981-8686FD138B5A}
+	EndGlobalSection
+EndGlobal
