@@ -4,14 +4,56 @@
   var messageBanner;
 
   // The Office initialize function must be run each time a new page is loaded.
-  Office.initialize = function (reason) {
+  Office.onReady(function () {
     $(document).ready(function () {
       var element = document.querySelector('.MessageBanner');
       messageBanner = new components.MessageBanner(element);
       messageBanner.hideBanner();
-      loadProps();
+      var savBtn = document.getElementById('saveMail');
+      savBtn.addEventListener('click', saveMimeMail);
+      loadFileTypes();
     });
-  };
+  });
+  
+  async function loadFileTypes() {
+    let bootstrapToken = await OfficeRuntime.auth.getAccessToken();
+    $.ajax({
+      url: '/api/Web/FileTypes',
+      accepts: 'application/json',
+      headers: {
+        "Authorization": "Bearer " + bootstrapToken // Used here to pass authorization in WebController
+      }
+    })
+      .done((response) => {
+        var select = document.getElementById('fileTypes');
+        response.forEach((val) => {
+          var opt = document.createElement("option");
+          opt.value = val;
+          opt.text = val;
+          select.options.add(opt);
+        });
+      });
+  }
+
+  async function saveMimeMail() {
+    let bootstrapToken = await OfficeRuntime.auth.getAccessToken();
+    const mailID = Office.context.mailbox.item.itemId;
+    const requestBody = { MessageID: mailID };
+    $.ajax({
+      type: "POST",
+      url: '/api/Web/StoreMimeMessage',
+      accepts: 'application/json',
+      headers: {
+        "Authorization": "Bearer " + bootstrapToken // Used here to pass authorization in WebController
+      },
+      data: JSON.stringify(requestBody),
+      contentType: "application/json; charset=utf-8"
+    }).done(function (data) {
+      console.log(data);
+    }).fail(function (error) {
+      console.log(error);
+    });
+  }
 
   // Take an array of AttachmentDetails objects and build a list of attachment names, separated by a line-break.
   function buildAttachmentsString(attachments) {

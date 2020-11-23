@@ -121,12 +121,14 @@
         </bt:LongStrings>
       </Resources>
       <WebApplicationInfo>
-        <Id></Id>
-        <Resource></Resource>
+        <Id>4c3a3d55-611b-4b40-89d0-95fc0114ebbd</Id>
+        <Resource>api://localhost:44397/4c3a3d55-611b-4b40-89d0-95fc0114ebbd</Resource>
         <Scopes>
           <Scope>offline_access</Scope>
           <Scope>openid</Scope>
           <Scope>email</Scope>
+          <Scope>Mail.Read</Scope>
+          <Scope>Files.ReadWrite</Scope>
         </Scopes>
       </WebApplicationInfo>
     </VersionOverrides>
