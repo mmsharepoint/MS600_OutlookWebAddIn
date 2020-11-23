@@ -38,7 +38,8 @@
   async function saveMimeMail() {
     let bootstrapToken = await OfficeRuntime.auth.getAccessToken();
     const mailID = Office.context.mailbox.item.itemId;
-    const requestBody = { MessageID: mailID };
+    const restMailID = Office.context.mailbox.convertToRestId(mailID, Office.MailboxEnums.RestVersion.v2_0);
+    const requestBody = { MessageID: restMailID };
     $.ajax({
       type: "POST",
       url: '/api/Web/StoreMimeMessage',

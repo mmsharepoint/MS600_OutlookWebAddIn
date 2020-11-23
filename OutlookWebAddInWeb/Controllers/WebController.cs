@@ -4,6 +4,7 @@ using OutlookWebAddInWeb.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -30,8 +31,9 @@ namespace OutlookWebAddInWeb.Controllers
       string[] graphScopes = { "https://graph.microsoft.com/Mail.Read", "https://graph.microsoft.com/Files.ReadWrite" };
       string accessToken = await GetAccessToken(graphScopes);
 
-      string mimeContent = await GetMime(accessToken, request.MessageID);
-      return mimeContent;
+      Stream mimeContent = await GetMime(accessToken, request.MessageID);
+      string webUrl = await uploadMail2OD(accessToken, mimeContent, "Testmail.eml");
+      return webUrl;
     }
     private async Task<string> GetAccessToken(string[] graphScopes)
     {
@@ -60,7 +62,7 @@ namespace OutlookWebAddInWeb.Controllers
         return null;
       }
     }
-    private async Task<string> GetMime(string accessToken, string mailID)
+    private async Task<Stream> GetMime(string accessToken, string mailID)
     {
       GraphServiceClient graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
           async (requestMessage) =>
@@ -72,12 +74,54 @@ namespace OutlookWebAddInWeb.Controllers
         .Content
         .Request()
         .GetAsync();
-      string mimeContentStr = string.Empty;
-      using (var Reader = new System.IO.StreamReader(mimeContent))
+      //string mimeContentStr = string.Empty;
+      //using (var Reader = new System.IO.StreamReader(mimeContent))
+      //{
+      //  mimeContentStr = Reader.ReadToEnd();
+      //}
+      return mimeContent;
+    }
+
+    private async Task<string> uploadMail2OD(string accessToken, Stream stream, string filename)
+    {
+      GraphServiceClient graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+          async (requestMessage) =>
+          {
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+          }));
+
+      if (stream.Length < (4 * 1024 * 1024))
       {
-        mimeContentStr = Reader.ReadToEnd();
+        DriveItem uploadResult = await graphClient.Me
+                                                      .Drive.Root
+                                                      .ItemWithPath(filename)
+                                                      .Content.Request()
+                                                      .PutAsync<DriveItem>(stream);
+        return uploadResult.WebUrl;
       }
-      return mimeContentStr;
+      else
+      {
+        try
+        { // This method supports files even greater 4MB
+          DriveItem item = null;
+          UploadSession session = await graphClient.Me.Drive.Root
+              .ItemWithPath(filename).CreateUploadSession().Request().PostAsync();          
+          int maxSizeChunk = 320 * 4 * 1024;
+          ChunkedUploadProvider provider = new ChunkedUploadProvider(session, graphClient, stream, maxSizeChunk);
+          var chunckRequests = provider.GetUploadChunkRequests();
+          List<Exception> exceptions = new List<Exception>();
+          foreach (UploadChunkRequest chunkReq in chunckRequests) //upload the chunks
+          {
+            var reslt = await provider.GetChunkRequestResponseAsync(chunkReq, exceptions);
+            if (reslt.UploadSucceeded) item = reslt.ItemResponse; // Check that upload succeeded
+          }
+          return item != null ? item.WebUrl : null;
+        }
+        catch (ServiceException ex)
+        {
+          return null;
+        }        
+      }
     }
   }
 }
