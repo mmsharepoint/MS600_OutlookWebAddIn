@@ -33,6 +33,7 @@
           select.options.add(opt);
         });
       });
+    renderAttachments(bootstrapToken);
   }
 
   async function saveMimeMail() {
@@ -56,6 +57,60 @@
     });
   }
 
+  async function renderAttachments(bootstrapToken) {
+    const mailID = Office.context.mailbox.item.itemId;
+    const restMailID = Office.context.mailbox.convertToRestId(mailID, Office.MailboxEnums.RestVersion.v2_0);
+    const requestBody = { MessageID: restMailID };
+    $.ajax({
+      url: '/api/Web/GetAttachments',
+      type: 'POST',
+      accepts: 'application/json',
+      headers: {
+        "Authorization": "Bearer " + bootstrapToken // Used here to pass authorization in WebController
+      },
+      data: JSON.stringify(requestBody),
+      contentType: "application/json; charset=utf-8"
+    }).done(function (data) {
+      console.log(data);
+      var list = document.getElementById('attachmentsList');
+      data.forEach((doc) => {
+        var listItem = document.createElement('li');
+        listItem.innerHTML = '<input type="checkbox" data-docID="' + doc.id + '" data-docName="' + doc.name + '" class="ms-Icon--Checkbox" /> ' + doc.name;
+        list.appendChild(listItem);
+      });
+    }).fail(function (error) {
+      console.log(error);
+    });
+  }
+
+  async function saveAttachments() {
+    let bootstrapToken = await OfficeRuntime.auth.getAccessToken();
+    var attachments = document.getElementsByClassName('ms-Icon--Checkbox');
+    var attArr = Array.from(attachments);
+    var selectedAttachments = attArr.filter(atc => atc.checked);
+    var selectedDocs = [];
+    selectedAttachments.forEach((sel) => {
+      console.log(sel.getAttribute('data-docID'));
+      selectedDocs.push({ id: sel.getAttribute('data-docID'), filename: sel.getAttribute('data-docName') });
+    });
+    const mailID = Office.context.mailbox.item.itemId;
+    const restMailID = Office.context.mailbox.convertToRestId(mailID, Office.MailboxEnums.RestVersion.v2_0);
+    const requestBody = { Attachments: selectedDocs, MessageID: restMailID };
+    $.ajax({
+      url: '/api/Web/SaveAttachments',
+      type: 'POST',
+      accepts: 'application/json',
+      headers: {
+        "Authorization": "Bearer " + bootstrapToken // Used here to pass authorization in WebController
+      },
+      data: JSON.stringify(requestBody),
+      contentType: "application/json; charset=utf-8"
+    }).done(function (data) {
+      console.log(data);      
+    }).fail(function (error) {
+      console.log(error);
+    });
+  }
   // Take an array of AttachmentDetails objects and build a list of attachment names, separated by a line-break.
   function buildAttachmentsString(attachments) {
     if (attachments && attachments.length > 0) {

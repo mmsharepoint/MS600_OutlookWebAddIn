@@ -38,34 +38,45 @@
     </div>
     <div id="content-main" class="ms-Grid" dir="ltr">
       <div class="ms-Grid-row">
-        <div class="ms-Grid-col  ms-sm4">
+        <div class="ms-Grid-col ms-sm4">
           <label>File Types</label>
         </div>
-        <div class="ms-Grid-col  ms-sm8">
+        <div class="ms-Grid-col ms-sm8">
           <select id="fileTypes"></select>
         </div>
-        <div class="ms-Grid-col  ms-sm4">
-          
+        <div class="ms-Grid-col ms-sm4">
+
         </div>
-        <div class="ms-Grid-col  ms-sm8">
+        <div class="ms-Grid-col ms-sm8">
           <button id="saveMail">Save Mail</button>
         </div>
       </div>
-    </div>
+      <div class="ms-Grid-row">
+        <div class="ms-Grid-col ms-sm8">
+          <ul id="attachmentsList" style="list-style: none;">
+          </ul>
+        </div>
+      </div>
+      <div class="ms-Grid-row">
+        <div class="ms-Grid-col ms-sm8">
+          <button id="saveAttachments">Save Attachments</button>
+        </div>
+      </div>
+     </div>
 
-    <!-- Component used for displaying notifications -->
-    <div class="MessageBanner" style="position:absolute;bottom: 0;">
+      <!-- Component used for displaying notifications -->
+      <div class="MessageBanner" style="position:absolute;bottom: 0;">
         <div class="MessageBanner-content">
-            <div class="MessageBanner-text">
-                <div class="MessageBanner-clipper">
-                    <div class="ms-font-m-plus ms-fontWeight-semibold" id="notificationHeader"></div>
-                    <div class="ms-font-m ms-fontWeight-semilight" id="notificationBody"></div>
-                </div>
+          <div class="MessageBanner-text">
+            <div class="MessageBanner-clipper">
+              <div class="ms-font-m-plus ms-fontWeight-semibold" id="notificationHeader"></div>
+              <div class="ms-font-m ms-fontWeight-semilight" id="notificationBody"></div>
             </div>
-            <button class="MessageBanner-expand" style="display:none"><i class="ms-Icon ms-Icon--chevronsDown"></i> </button>
-            <div class="MessageBanner-action"></div>
+          </div>
+          <button class="MessageBanner-expand" style="display:none"><i class="ms-Icon ms-Icon--chevronsDown"></i> </button>
+          <div class="MessageBanner-action"></div>
         </div>
         <button class="MessageBanner-close"> <i class="ms-Icon ms-Icon--ChromeClose"></i> </button>
-    </div>
+      </div>
 </body>
 </html>

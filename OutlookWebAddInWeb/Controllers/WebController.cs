@@ -35,6 +35,46 @@ namespace OutlookWebAddInWeb.Controllers
       string webUrl = await uploadMail2OD(accessToken, mimeContent, "Testmail.eml");
       return webUrl;
     }
+
+
+    [HttpPost]
+    public async Task<IMessageAttachmentsCollectionPage> GetAttachments([FromBody] MimeMail request)
+    {
+      string[] graphScopes = { "https://graph.microsoft.com/Mail.Read", "https://graph.microsoft.com/Files.ReadWrite" };
+      string accessToken = await GetAccessToken(graphScopes);
+      GraphServiceClient graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+          async (requestMessage) =>
+          {
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+          }));
+
+      var attachments = await graphClient.Me.Messages[request.MessageID]
+        .Attachments
+        .Request()
+        .GetAsync();
+
+      return attachments;
+    }
+
+    [HttpPost]
+    public async Task<string[]> SaveAttachments([FromBody] Models.AttachmentRequest request)
+    {
+      string[] graphScopes = { "https://graph.microsoft.com/Mail.Read", "https://graph.microsoft.com/Files.ReadWrite" };
+      string accessToken = await GetAccessToken(graphScopes);
+      GraphServiceClient graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+          async (requestMessage) =>
+          {
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+          }));
+      List<string> resultUrls = new List<string>();
+      foreach (Models.Attachment file in request.Attachments)
+      {
+        Stream attachment = await GetAttachment(accessToken, request.MessageID, file.id);
+        string url = await uploadMail2OD(accessToken, attachment, file.filename);
+        resultUrls.Add(url);
+      }
+      return resultUrls.ToArray();
+    }
     private async Task<string> GetAccessToken(string[] graphScopes)
     {
       string bootstrapContext = ClaimsPrincipal.Current.Identities.First().BootstrapContext.ToString();
@@ -122,6 +162,22 @@ namespace OutlookWebAddInWeb.Controllers
           return null;
         }        
       }
+    }
+
+    private async Task<Stream> GetAttachment(string accessToken, string mailID, string attachmentID)
+    {
+      GraphServiceClient graphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+          async (requestMessage) =>
+          {
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", accessToken);
+          }));
+      // Workaround for missing .Content impl. on .Attachments["ID"].
+      var attachmentRequest = graphClient.Me.Messages[mailID]
+                        .Attachments[attachmentID];
+      var fileRequest = new FileAttachmentRequestBuilder(attachmentRequest.RequestUrl, graphClient);
+      var u = fileRequest.Content.Request().RequestUrl;
+      Stream fileContent = await fileRequest.Content.Request().GetAsync();      
+      return fileContent;
     }
   }
 }
