@@ -75,9 +75,11 @@
       var list = document.getElementById('attachmentsList');
       data.forEach((doc) => {
         var listItem = document.createElement('li');
-        listItem.innerHTML = '<input type="checkbox" data-docID="' + doc.id + '" data-docName="' + doc.name + '" class="ms-Icon--Checkbox" /> ' + doc.name;
+        listItem.innerHTML = '<input type="checkbox" data-docID="' + doc.id + '" data-docName="' + doc.name + '" /> ' + doc.name;
         list.appendChild(listItem);
       });
+      var savBtn = document.getElementById('saveAttachments');
+      savBtn.addEventListener('click', saveAttachments);
     }).fail(function (error) {
       console.log(error);
     });
@@ -85,11 +87,10 @@
 
   async function saveAttachments() {
     let bootstrapToken = await OfficeRuntime.auth.getAccessToken();
-    var attachments = document.getElementsByClassName('ms-Icon--Checkbox');
+    var attachments = document.querySelectorAll('.attachmentsList input[type="checkbox"]:checked');
     var attArr = Array.from(attachments);
-    var selectedAttachments = attArr.filter(atc => atc.checked);
     var selectedDocs = [];
-    selectedAttachments.forEach((sel) => {
+    attArr.forEach((sel) => {
       console.log(sel.getAttribute('data-docID'));
       selectedDocs.push({ id: sel.getAttribute('data-docID'), filename: sel.getAttribute('data-docName') });
     });
